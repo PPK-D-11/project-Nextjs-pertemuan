@@ -161,6 +161,10 @@ export default function DashboardPage() {
               <span>♡</span>
               Atur Limit
             </button>
+<button onClick={() => router.push("/budget")}>
+  <span>◇</span>
+  Monthly Budget
+</button>
 
             <button onClick={() => router.push("/preference")}>
               <span>⚙</span>

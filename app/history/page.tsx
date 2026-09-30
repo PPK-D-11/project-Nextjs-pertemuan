@@ -25,28 +25,40 @@ export default function HistoryPage() {
   const [editAmount, setEditAmount] = useState("");
   const [editDescription, setEditDescription] = useState("");
 
-  async function getTransactions() {
-    try {
-      const response = await fetch("/api/transactions");
+  async function getTransactions(selectedFilter: Filter = filter) {
+  try {
+    setLoading(true);
 
-      if (response.status === 401) {
-        router.push("/login");
-        return;
-      }
+    let url = "/api/transactions";
 
-      if (!response.ok) {
-        throw new Error("Gagal mengambil transaksi");
-      }
-
-      const data = await response.json();
-
-      setTransactions(data.transactions || []);
-    } catch (error) {
-      console.error("Gagal mengambil transaksi:", error);
-    } finally {
-      setLoading(false);
+    if (selectedFilter === "INCOME") {
+      url = "/api/transactions?type=INCOME";
     }
+
+    if (selectedFilter === "EXPENSE") {
+      url = "/api/transactions?type=EXPENSE";
+    }
+
+    const response = await fetch(url);
+
+    if (response.status === 401) {
+      router.push("/login");
+      return;
+    }
+
+    if (!response.ok) {
+      throw new Error("Gagal mengambil transaksi");
+    }
+
+    const data = await response.json();
+
+    setTransactions(data.transactions || []);
+  } catch (error) {
+    console.error("Gagal mengambil transaksi:", error);
+  } finally {
+    setLoading(false);
   }
+}
 
   useEffect(() => {
     getTransactions();
@@ -119,18 +131,33 @@ export default function HistoryPage() {
       <h1>History Transaksi</h1>
 
       <div>
-        <button onClick={() => setFilter("ALL")}>
-          Semua
-        </button>{" "}
+  <button
+    onClick={() => {
+      setFilter("ALL");
+      getTransactions("ALL");
+    }}
+  >
+    Semua
+  </button>{" "}
 
-        <button onClick={() => setFilter("INCOME")}>
-          Pemasukan
-        </button>{" "}
+  <button
+    onClick={() => {
+      setFilter("INCOME");
+      getTransactions("INCOME");
+    }}
+  >
+    Pemasukan
+  </button>{" "}
 
-        <button onClick={() => setFilter("EXPENSE")}>
-          Pengeluaran
-        </button>
-      </div>
+  <button
+    onClick={() => {
+      setFilter("EXPENSE");
+      getTransactions("EXPENSE");
+    }}
+  >
+    Pengeluaran
+  </button>
+</div>
 
       <hr />
 

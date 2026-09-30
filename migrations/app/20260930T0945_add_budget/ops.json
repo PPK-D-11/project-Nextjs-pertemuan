@@ -1,0 +1,164 @@
+[
+  {
+    "id": "table.budget",
+    "label": "Create table \"budget\"",
+    "summary": "Creates table \"budget\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "budget"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"budget\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"budget\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"budget\"",
+        "sql": "CREATE TABLE \"public\".\"budget\" (\n  \"amount\" int4 NOT NULL,\n  \"createdAt\" timestamptz DEFAULT (now()) NOT NULL,\n  \"id\" SERIAL NOT NULL,\n  \"month\" int4 NOT NULL,\n  \"updatedAt\" timestamptz NOT NULL,\n  \"userId\" int4 NOT NULL,\n  \"year\" int4 NOT NULL,\n  PRIMARY KEY (\"id\")\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"budget\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"budget\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unique.budget.budget_userId_month_year_key",
+    "label": "Add unique constraint on \"budget\" (userId, month, year)",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "unique",
+        "name": "budget_userId_month_year_key",
+        "table": "budget"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"budget_userId_month_year_key\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "budget_userId_month_year_key",
+          "public",
+          "\"public\".\"budget\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add unique constraint \"budget_userId_month_year_key\"",
+        "sql": "ALTER TABLE \"public\".\"budget\" ADD CONSTRAINT \"budget_userId_month_year_key\" UNIQUE (\"userId\", \"month\", \"year\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"budget_userId_month_year_key\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "budget_userId_month_year_key",
+          "public",
+          "\"public\".\"budget\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.budget.budget_userId_idx_a489d58a",
+    "label": "Create index \"budget_userId_idx_a489d58a\" on \"budget\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "budget_userId_idx_a489d58a",
+        "table": "budget"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"budget_userId_idx_a489d58a\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"budget_userId_idx_a489d58a\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"budget_userId_idx_a489d58a\"",
+        "sql": "CREATE INDEX \"budget_userId_idx_a489d58a\" ON \"public\".\"budget\" (\"userId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"budget_userId_idx_a489d58a\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"budget_userId_idx_a489d58a\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.budget.budget_userId_fkey",
+    "label": "Add foreign key \"budget_userId_fkey\" on \"budget\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "budget_userId_fkey",
+        "table": "budget"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"budget_userId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "budget_userId_fkey",
+          "public",
+          "\"public\".\"budget\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"budget_userId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"budget\"\nADD CONSTRAINT \"budget_userId_fkey\"\nFOREIGN KEY (\"userId\")\nREFERENCES \"public\".\"user\" (\"id\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"budget_userId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "budget_userId_fkey",
+          "public",
+          "\"public\".\"budget\""
+        ]
+      }
+    ]
+  }
+]

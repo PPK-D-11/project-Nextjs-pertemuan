@@ -8,6 +8,7 @@ model User {
   name         String?
   posts        Post[]
   transactions Transaction[]
+  budgets      Budget[]
   createdAt    TimestamptzString @default(now())
   updatedAt    temporal.updatedAtString()
 }
@@ -31,4 +32,18 @@ model Transaction {
   createdAt   TimestamptzString @default(now())
 
   user User @relation(fields: [userId], references: [id])
+}
+
+model Budget {
+  id        Int      @id @default(autoincrement())
+  amount    Int
+  month     Int
+  year      Int
+  userId    Int
+  createdAt TimestamptzString @default(now())
+  updatedAt temporal.updatedAtString()
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@unique([userId, month, year])
 }
